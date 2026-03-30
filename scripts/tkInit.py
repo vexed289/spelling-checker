@@ -56,7 +56,7 @@ class SpellingApp:
         self.resultLabel = tk.Label(frame, text="", font=("Arial", 20))
         self.resultLabel.pack(pady=10)
 
-        self.scoreLabel = tk.Label(self.root, text=str(self), font=("Arial", 24))
+        self.scoreLabel = tk.Label(self.root, text=str(self), font=("Arial", 30))
         self.scoreLabel.place(x=10, y=10)
 
         self.userTextbox.bind("<Key>", lambda _: self.resultLabel.config(text=""))
