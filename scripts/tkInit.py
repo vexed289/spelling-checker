@@ -5,7 +5,7 @@ import threading
 
 class SpellingApp:
     def __init__(self, root, spellings):
-        self.root = root
+        self.root: tk.Tk = root
         self.spellings = spellings
         self.lastWord = None
         self.word = getWord(self.lastWord, spellings)
@@ -18,12 +18,23 @@ class SpellingApp:
 
     def __repr__(self):
         return f"SpellingApp(score={self.score}, total={self.total}, word='{self.word}')"
+    
+    def center(self):
+        self.root.update_idletasks()
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+        self.root.geometry(f"{width}x{height}+{x}+{y}")
 
     def uiSetup(self):
+        self.root.geometry("500x500")
         self.root.title("Spellings")
-        self.root.attributes("-fullscreen", True)
+        #self.root.attributes("-fullscreen", True)
         self.root.bind("<Escape>", lambda e: self.root.attributes("-fullscreen", False))
-
+        self.center()
         frame = tk.Frame(self.root)
         frame.pack(expand=True)
 
@@ -38,9 +49,13 @@ class SpellingApp:
             highlightthickness=0,
             relief="flat",
             bg=frame.cget("bg"),
-            activebackground=frame.cget("bg")
+            activebackground=frame.cget("bg"),
+            highlightbackground=frame.cget("bg"),
+            highlightcolor=frame.cget("bg"),
+            bd=0,
+            takefocus=0
         )
-        self.playButton.pack(pady=10)
+        self.playButton.pack(pady=20)
 
         self.userTextbox = tk.Entry(frame, font=("Arial", 16), width=20)
         self.userTextbox.pack(pady=10)
@@ -109,4 +124,5 @@ def initWindow(spellings: list):
     root = tk.Tk()
     app = SpellingApp(root, spellings)
     app.playWord()
+
     root.mainloop()

@@ -15,8 +15,10 @@ def getWord(last: str | None, spellings: list) -> str:
 def speak(word: str):
     engine = pyttsx3.init()
     engine.setProperty('rate', 150)
+    engine.setProperty("voice", "com.apple.voice.compact.en-GB.Daniel")
     engine.say(word)
     engine.runAndWait()
+    
 
 def checkSpelling(input: str, correct: str):
     return input.strip().lower() == correct.strip().lower()
