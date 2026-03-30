@@ -2,23 +2,20 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from spellingHandler import getWord, checkSpelling, speak
 import threading
-import queue
 
 class SpellingApp:
     def __init__(self, root, spellings):
         self.root = root
         self.spellings = spellings
-
         self.lastWord = None
         self.word = getWord(self.lastWord, spellings)
         self.score = 0
         self.total = 0
-
         self.uiSetup()
 
     def __str__(self):
         return f"Score: {self.score}/{self.total}"
-    
+
     def __repr__(self):
         return f"SpellingApp(score={self.score}, total={self.total}, word='{self.word}')"
 
@@ -48,7 +45,12 @@ class SpellingApp:
         self.userTextbox = tk.Entry(frame, font=("Arial", 16), width=20)
         self.userTextbox.pack(pady=10)
 
-        self.submitButton = tk.Button(frame, text="Submit", font=("Arial", 20), command=self.submit)
+        self.submitButton = tk.Button(
+            frame,
+            text="Submit",
+            font=("Arial", 20),
+            command=self.submit
+        )
         self.submitButton.pack(pady=10)
 
         self.resultLabel = tk.Label(frame, text="", font=("Arial", 20))
@@ -58,7 +60,7 @@ class SpellingApp:
         self.scoreLabel.place(x=10, y=10)
 
         self.userTextbox.bind("<Key>", lambda _: self.resultLabel.config(text=""))
-        self.userTextbox.bind("<Return>", lambda _: self.submit())
+        self.userTextbox.bind("<Return>", lambda _: self.submit() if self.userTextbox.get().strip() != "" else None)
 
     def playWord(self):
         self.playButton.config(state="disabled")
@@ -68,23 +70,39 @@ class SpellingApp:
             self.root.after(0, lambda: self.playButton.config(state="normal"))
 
         threading.Thread(target=run, daemon=True).start()
-    
+
     def submit(self):
-        
-        correct = checkSpelling(self.userTextbox.get(), self.word)
+        userInput = self.userTextbox.get()
+        correct = checkSpelling(userInput, self.word)
+
         self.lastWord = self.word
         self.word = getWord(self.lastWord, self.spellings)
 
         if correct:
-            text = f"Correct!"
-            self.score+=1
+            text = "Correct!"
+            self.score += 1
         else:
             text = f"Incorrect. The word was {self.lastWord}"
-        self.total+=1
+
+        self.total += 1
+
         self.resultLabel.config(text=text)
         self.scoreLabel.config(text=str(self))
         self.userTextbox.delete(0, tk.END)
-        self.playWord()
+
+
+        def runSpeech():
+            speak(text)
+            if not correct and self.lastWord:
+                for ch in self.lastWord:
+                    speak(ch)
+                speak("You spelt it")
+                for ch in userInput.strip().lower():
+                    speak(ch)
+            speak("Next word")
+            self.playWord()
+
+        runSpeech()
 
 
 def initWindow(spellings: list):

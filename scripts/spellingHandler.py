@@ -14,6 +14,7 @@ def getWord(last: str | None, spellings: list) -> str:
 
 def speak(word: str):
     engine = pyttsx3.init()
+    engine.setProperty('rate', 150)
     engine.say(word)
     engine.runAndWait()
 
